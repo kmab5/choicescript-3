@@ -150,7 +150,15 @@ server.listen(PORT, async () => {
   ok('zero /api requests were made', apiHits === 0, apiHits + ' hits');
 
   console.log('\nit is still the same app');
-  ok('the HUD renders', !!d.querySelector('nav[aria-label="Game controls"]'));
+  const bar = d.querySelector('nav[aria-label="Game controls"]');
+  ok('the toolbar renders', !!bar);
+  const labels = bar ? Array.prototype.map.call(bar.querySelectorAll('button'), (b) => b.textContent.trim()) : [];
+  ok('controls are named, not bare icons',
+    labels.some((t) => /Stats/.test(t)) && labels.some((t) => /Settings/.test(t)),
+    JSON.stringify(labels));
+  ok('every control clears the 44px target',
+    bar ? Array.prototype.every.call(bar.querySelectorAll('button'),
+      (b) => (b.className || '').includes('min-h-touch')) : false);
   win.ChoiceScript.setTheme('terminal');
   ok('themes still apply', d.body.classList.contains('theme-terminal'));
   ok('theme tokens resolve from the static stylesheet',
@@ -158,7 +166,9 @@ server.listen(PORT, async () => {
     JSON.stringify(win.getComputedStyle(d.body).getPropertyValue('--cs-paper')));
   win.ChoiceScript.openStats();
   await new Promise((r) => setTimeout(r, 400));
-  ok('stats sheet opens', !!d.querySelector('[role=dialog]'), win.ChoiceScript.getState().overlay);
+  ok('stats dialog opens', !!d.querySelector('[role=dialog]'), win.ChoiceScript.getState().overlay);
+  ok('it is a centred dialog, not a drawer',
+    !d.querySelector('[data-vaul-drawer]'));
   ok('stat bars render as meters', d.querySelectorAll('[role=meter]').length > 0,
     d.querySelectorAll('[role=meter]').length + ' meters');
 

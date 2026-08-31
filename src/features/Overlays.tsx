@@ -12,8 +12,7 @@ import { Blocks } from './Blocks';
 import { PendingView } from './Pending';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Sheet } from '@/components/ui/sheet';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DialogPanel } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
 interface ScreenProps {
@@ -275,7 +274,7 @@ const TITLES: Record<string, string> = {
 export function Overlays({ cs, state, gameId }: ScreenProps) {
   const open = state.overlay;
   return (
-    <Sheet
+    <DialogPanel
       open={!!open}
       onOpenChange={(v) => !v && cs.closeOverlay()}
       title={open ? TITLES[open] ?? open : ''}
@@ -310,28 +309,27 @@ export function Overlays({ cs, state, gameId }: ScreenProps) {
             ))}
           </nav>
         )}
-    </Sheet>
+    </DialogPanel>
   );
 }
 
 export function ModalPrompt({ cs, state }: { cs: ChoiceScriptApi; state: ChoiceScriptState }) {
   const modal = state.modal;
   return (
-    <Dialog open={!!modal} onOpenChange={(v) => !v && modal && cs.answerModal(false)}>
-      <DialogContent aria-describedby={undefined}>
-        <DialogHeader>
-          <DialogTitle>Message</DialogTitle>
-        </DialogHeader>
-        <p className="mb-4">{modal?.message}</p>
-        <div className="flex justify-end gap-2">
-          {modal?.kind === 'confirm' && (
-            <Button onClick={() => cs.answerModal(false)}>Cancel</Button>
-          )}
-          <Button variant="default" onClick={() => cs.answerModal(true)}>
-            OK
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <DialogPanel
+      open={!!modal}
+      onOpenChange={(v) => !v && modal && cs.answerModal(false)}
+      title="Message"
+    >
+      <p className="mb-4">{modal?.message}</p>
+      <div className="flex justify-end gap-2">
+        {modal?.kind === 'confirm' && (
+          <Button onClick={() => cs.answerModal(false)}>Cancel</Button>
+        )}
+        <Button variant="default" onClick={() => cs.answerModal(true)}>
+          OK
+        </Button>
+      </div>
+    </DialogPanel>
   );
 }

@@ -13,9 +13,9 @@ import type { StoredGame } from '@/lib/library';
 import { Blocks } from './Blocks';
 import { PendingView } from './Pending';
 import { Overlays, ModalPrompt } from './Overlays';
-import { Hud } from './Hud';
+import { Toolbar } from './Toolbar';
 import { useAchievementToasts } from './useAchievementToasts';
-import { Button } from '@/components/ui/button';
+
 
 /** `subscribe` + `getState` is exactly the external-store contract React wants. */
 function useChoiceScript(cs: ChoiceScriptApi) {
@@ -44,15 +44,21 @@ export function Player({
   }, [state.history, state.theme.animate]);
 
   return (
-    <div className="mx-auto max-w-[var(--cs-measure,66ch)] px-5 pb-40 pt-[calc(1.25rem+env(safe-area-inset-top))]">
-      {/* The title recedes: it is the author's, not a product banner. */}
-      <header className="mb-8">
-        <h1 className="m-0 font-ui text-[0.9375rem] font-medium tracking-tight text-ink-muted">
-          {state.title || game.title}
-        </h1>
-        {state.author && (
-          <p className="mt-0.5 font-ui text-sm text-ink-faint">{state.author}</p>
-        )}
+    <div className="mx-auto max-w-[var(--cs-measure,66ch)] px-5 pb-20 pt-[calc(1.25rem+env(safe-area-inset-top))]">
+      {/*
+        The title recedes — it is the author's, not a product banner — while the
+        controls beside it are named and stay where you left them.
+      */}
+      <header className="mb-8 border-b border-rule pb-3">
+        <div className="mb-2">
+          <h1 className="m-0 font-ui text-[0.9375rem] font-medium tracking-tight text-ink-muted">
+            {state.title || game.title}
+          </h1>
+          {state.author && (
+            <p className="mt-0.5 font-ui text-sm text-ink-faint">{state.author}</p>
+          )}
+        </div>
+        <Toolbar cs={cs} state={state} onExit={onExit} />
       </header>
 
       {state.loading && (
@@ -72,14 +78,6 @@ export function Player({
         <PendingView pending={state.pending} cs={cs} />
       </motion.main>
 
-      {/* a quiet way back that does not compete with the HUD */}
-      <div className="mt-16 border-t border-rule pt-4">
-        <Button variant="ghost" size="sm" onClick={onExit}>
-          ← Library
-        </Button>
-      </div>
-
-      <Hud cs={cs} state={state} onExit={onExit} />
       <Overlays cs={cs} state={state} gameId={game.id} />
       <ModalPrompt cs={cs} state={state} />
     </div>

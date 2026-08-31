@@ -1,7 +1,7 @@
 # ChoiceScript — Vite Front End
 
 React 18 · TypeScript · Vite 5 · **Tailwind CSS 4** · Radix UI · **Motion** ·
-**Vaul** · **Sonner**
+**Sonner**
 
 A complete ChoiceScript player as a **static site**. No server, no database,
 no API. Games, saves and settings live on the device; the engine runs in the
@@ -18,10 +18,10 @@ that presents it as a document with buttons attached has failed.
 
 What that produced:
 
-- **The HUD lives in the thumb zone.** Mobile short sessions are the stated
-  default case, so navigation is a floating bar at the bottom of the screen,
-  not a toolbar a hand's length away at the top. It retreats while you read
-  downward and returns on any upward intent or when you stop.
+- **Named controls that stay put.** Stats, Saves, Achievements, Settings and
+  Library sit in the header with their labels showing. Labels carry meaning
+  that icons only gesture at, and a control that does not move is easier to
+  return to than one that hides while you read.
 - **The title recedes.** It is set in small UI type in muted ink, because it is
   the author's, not a product banner.
 - **The choice is the moment the game happens**, so it gets the most attention:
@@ -34,6 +34,9 @@ What that produced:
   clearest case of "removes the game feel" in the build.
 - **Stat bars grow to their value**, so the number is legible as motion before
   you read it.
+- **Dialogs settle rather than slide.** A short travel with a long ease-out
+  reads as a panel arriving and coming to rest, which is calmer than a drawer
+  being pulled up from the edge of the screen.
 
 ## Why these libraries
 
@@ -44,7 +47,6 @@ sake:
 |---|---|
 | **Tailwind v4** | CSS-first `@theme`, so the palette maps directly onto the engine's CSS variables with no config file and no second source of truth |
 | **Motion** | spring physics on the choice press — the tactile part of "tactile game HUD" |
-| **Vaul** | a real drag-to-dismiss bottom sheet, not a dialog anchored low; mobile is the default case |
 | **Sonner** | achievement toasts, styled from the engine tokens so they re-theme too |
 | *(none)* | archive reading and storage use native `DecompressionStream` and IndexedDB |
 
