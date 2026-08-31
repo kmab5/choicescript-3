@@ -18,10 +18,12 @@ that presents it as a document with buttons attached has failed.
 
 What that produced:
 
-- **Named controls that stay put.** Stats, Saves, Achievements, Settings and
-  Library sit in the header with their labels showing. Labels carry meaning
-  that icons only gesture at, and a control that does not move is easier to
-  return to than one that hides while you read.
+- **A sticky title bar with named controls.** Stats, Saves, Achievements and
+  Settings keep their labels — labels carry meaning that icons only gesture at.
+  The bar stays put, because in a 3–10 hour game you should never scroll back
+  to find the stats button. Its separating hairline appears only once you have
+  scrolled, so the bar is weightless at the top of a screen and grounded once
+  there is text behind it.
 - **The title recedes.** It is set in small UI type in muted ink, because it is
   the author's, not a product banner.
 - **The choice is the moment the game happens**, so it gets the most attention:
@@ -62,6 +64,21 @@ npm run dev            # http://localhost:5173
 `npm run build` produces a `dist/` folder of static files. That is the whole
 application: the front end, the ChoiceScript engine, and the theme stylesheet.
 
+## Updating an existing checkout
+
+Unzipping over an old copy leaves behind files that no longer exist upstream.
+`package.json` gets replaced, the orphan does not, and the build fails on an
+import for a dependency that is no longer installed.
+
+Either replace the directory outright, or delete the known orphans:
+
+```
+rm -f src/components/ui/sheet.tsx src/features/Hud.tsx src/lib/api.ts \
+      tailwind.config.js postcss.config.js e2e-test.js
+```
+
+`npm run build` checks for these first and tells you exactly what to remove.
+
 ## Deploy it
 
 Anywhere that serves static files. All of these are free:
@@ -69,7 +86,7 @@ Anywhere that serves static files. All of these are free:
 | Host | Notes |
 |---|---|
 | **Cloudflare Pages** | unlimited bandwidth, no cold starts, global edge — the pick |
-| **Netlify** / **Vercel** | 100 GB/month free, nicer preview deploys |
+| **Netlify** / **Vercel** | 100 GB/month free, nicer preview deploys. Vercel detects Vite automatically — no `vercel.json` needed; output is `dist`. |
 | **GitHub Pages** | fine for a public repo; `base: './'` is already set for project sites |
 
 **Render is the wrong shape.** Its free web service sleeps after 15 minutes and
@@ -117,6 +134,25 @@ Assets are Blobs, served to `<img>` through `URL.createObjectURL`.
   exempt.
 - **Games are per-device.** No sync, no shared library across phone and laptop.
   That is inherent to client-side storage.
+
+## The theme-scope trap
+
+Worth reading before touching `index.css`.
+
+The engine declares its colour tokens on `<body>` and overrides them per theme
+(`body.theme-nocturne`). Tailwind's `@theme` emits `--color-*` at `:root`, where
+`var(--cs-paper)` **cannot see them** — custom properties only inherit downward
+— so it silently resolves to the fallback and never re-themes.
+
+The symptom is deceptive rather than obvious: prose themes correctly, because it
+is styled directly on `body`, while every utility-driven surface (`bg-raised`,
+`text-ink`, `border-rule`) stays on the default palette. Choice text changes
+colour; its background does not.
+
+The fix is to re-declare the same variables inside a `body` rule, which
+`index.css` does. `npm run test:theme` parses the built stylesheet and fails if
+any mapped variable exists only at `:root`. This bug has been introduced twice;
+the guard exists so it cannot be a third time.
 
 ## The typed contract
 
@@ -173,6 +209,10 @@ WCAG 2.1 AA: choices are native radios in a labelled group, stat bars are
 `aria-modal`), and `prefers-reduced-motion` is respected.
 
 ## Testing
+
+Everything runs on Windows, macOS and Linux — no shell, no `zip` binary, no
+`/tmp`. The e2e harness builds its archive in JavaScript and ships a small
+sample game, so it needs no arguments and no external game to run.
 
 ```
 npm run typecheck
